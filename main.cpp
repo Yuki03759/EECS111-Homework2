@@ -10,13 +10,8 @@
 #include "p2_threads.h"
 #include "utils.h"
 
-pthread_cond_t  cond  = PTHREAD_COND_INITIALIZER;
-pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 struct timeval t_global_start;
-enum Gender{
-    MALE,
-    FEMALE,
-};
+Fittingroom room;
 
 using namespace std;
 
@@ -40,65 +35,30 @@ int main(int argc, char** argv)
 	// This is to set the global start time
 	gettimeofday(&t_global_start, NULL);
 
-
-	pthread_t       tid = 0;
+	pthread_t       tid[2];
 	int             status = 0;
 	int             work = 0;
-
-    //creating each_gender_cnt people
-    Person p[2*each_gender_cnt];
-    int male_cnt = each_gender_cnt;
-    int female_cnt = each_gender_cnt;
     
-    for(int i = 0; i < 2*each_gender_cnt; i++){
-        
-        p[i].set_order(i+1);
-        
-        //randomly assign gender
-        srand( time(NULL) );
-        int randNum = rand()%2;
-        
-        if(randNum == MALE && male_cnt > 0){
-            p[i].set_gender(randNum);
-            male_cnt--;
-        }
-        else{
-            p[i].set_gender(FEMALE);
-            female_cnt--;
-        }
-        
-        cout << "male_cnt : " << male_cnt << endl;
-        cout << "female_cnt : " << female_cnt << endl;
-        std::cout << "trying to send " << p[i].get_gender() << std::endl;
-        
-        usleep(MSEC(200));
-        p[i].start();
-        
-        usleep(MSEC(150));
-        p[i].complete();
+    room.set_num(each_gender_cnt);
     
-	
-        if(pthread_create(&tid, NULL, threadfunc, &p[i])) {
-            fprintf(stderr, "Error creating thread\n");		
-        }
-        usleep(MSEC(10));
-
-        for (int i=0; i<5; i++) {
-            printf("Wake up thread after (%d) seconds\n", (5-i));
-            usleep(MSEC(1000));
-        }
-
-        printf("Wake up thread\n");
-        status = pthread_cond_signal(&cond);
-	
-
-
-        /* wait for the second thread to finish */
-        if(pthread_join(tid, NULL)) {
+    if(pthread_create(&tid[0], NULL, createPerson, NULL)) {
+        fprintf(stderr, "Error creating thread\n");		
+    }
+    if(pthread_create(&tid[1], NULL, assignPerson, NULL)) {
+        fprintf(stderr, "Error creating thread\n");		
+    }
+    if(pthread_create(&tid[2], NULL, removePerson, NULL)) {
+        fprintf(stderr, "Error creating thread\n");		
+    }	  
+        
+    /* wait for the second thread to finish */
+    for(int i=0; i < 3; i++){
+        if(pthread_join(tid[i], NULL)) {
             fprintf(stderr, "Error joining thread\n");	
         }
-
     }
+    
+    room.printVector(room.waitList);
     
 	return 0;
 

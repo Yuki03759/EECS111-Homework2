@@ -13,7 +13,9 @@
 
 void *threadfunc(void *parm);
 
-
+void *createPerson(void *parm);
+void *assignPerson(void *parm);
+void *removePerson(void *parm);
 
 
 #endif

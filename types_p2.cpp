@@ -26,33 +26,53 @@ int Person::ready_to_leave(void) {
 
 void Person::start(void) {
 	gettimeofday(&t_start, NULL);
-	printf("(%lu)th person enters the restroom: \n", order);
+	printf("(%lu)th person enters the fittingroom: \n", order);
 	printf(" - (%lu) milliseconds after the creation\n", get_elasped_time(t_create, t_start));
 }
 
 void Person::complete(void) {
 	gettimeofday(&t_end, NULL);
-	printf("(%lu)th person comes out of the restroom: \n", order);
+	printf("(%lu)th person comes out of the fittingroom: \n", order);
 	printf(" - (%lu) milliseconds after the creation\n", get_elasped_time(t_create, t_end));
-	printf(" - (%lu) milliseconds after using the restroom\n", get_elasped_time(t_start, t_end));
+	printf(" - (%lu) milliseconds after using the fittingroom\n", get_elasped_time(t_start, t_end));
 }
 
 Person::Person() {
 	gettimeofday(&t_create, NULL);
 }
 
+void Fittingroom::set_num(int data) { num = data; }
+int Fittingroom::get_num(void)      { return num; }
 
+void Fittingroom::set_status(int data) { status = data; }
+int Fittingroom::get_status(void)     { return status; }
 
-// You need to use this function to print the Restroom's status
-void Restroom::print_status(void) {
-	printf("Print restroom status\n");
+// You need to use this function to print the Fittingroom's status
+void Fittingroom::print_status(void) {
+	printf("Print fittingroom status\n");
+    cout << "Status : " << status << endl;
 }
 
 
 // Call by reference
 // This is just an example. You can implement any function you need
-void Restroom::add_person(Person& p) {
+void Fittingroom::add_person(Person& p) {
 	// Do nothing;
+}
+
+
+void Fittingroom::printVector(vector<Person> v){
+    
+    cout << "print Vector" << endl;
+    cout << "Gender\tOrder" << endl;
+    cout << "-------------------" << endl;
+    for(int i = 0; i < v.size(); i++){
+        if(v[i].get_gender() == MALE)
+            cout << "Male" <<'\t';
+        else
+            cout << "Female" << '\t';
+        cout << v[i].get_order() << endl; 
+    }
 }
 
 
