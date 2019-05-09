@@ -11,7 +11,6 @@
 #include "types_p2.h"
 
 
-void *threadfunc(void *parm);
 
 void *createPerson(void *parm);
 void *assignPerson(void *parm);

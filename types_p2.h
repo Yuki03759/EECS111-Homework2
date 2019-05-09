@@ -51,6 +51,7 @@ public:
 
 	void start(void);
 	void complete(void);
+    void printPerson(int gender, long t);
 };
 
 
@@ -85,13 +86,9 @@ public:
 	// This is just an example. You can implement any function you need
 	void add_person(Person& p);
 
-    void printVector(vector<Person> v);
+    void printVector(vector<Person> v, string str);
 
-
-
-
-
-
+    void printSendRoom(vector<Person> fitroom, int gender, long t);
 };
 
 

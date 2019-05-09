@@ -58,7 +58,8 @@ int main(int argc, char** argv)
         }
     }
     
-    room.printVector(room.waitList);
+    //room.printVector(room.waitList, "waitList after thread");
+    
     
 	return 0;
 

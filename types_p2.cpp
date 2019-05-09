@@ -1,7 +1,7 @@
 #include "types_p2.h"
 #include "utils.h"
 
-
+using namespace std;
 
 void Person::set_gender(int data) { gender = data; }
 int Person::get_gender(void)      { return gender; }
@@ -28,13 +28,20 @@ void Person::start(void) {
 	gettimeofday(&t_start, NULL);
 	printf("(%lu)th person enters the fittingroom: \n", order);
 	printf(" - (%lu) milliseconds after the creation\n", get_elasped_time(t_create, t_start));
-}
+     }
 
 void Person::complete(void) {
 	gettimeofday(&t_end, NULL);
-	printf("(%lu)th person comes out of the fittingroom: \n", order);
-	printf(" - (%lu) milliseconds after the creation\n", get_elasped_time(t_create, t_end));
-	printf(" - (%lu) milliseconds after using the fittingroom\n", get_elasped_time(t_start, t_end));
+	//printf("(%lu)th person comes out of the fittingroom: \n", order);
+	//printf(" - (%lu) milliseconds after the creation\n", get_elasped_time(t_create, t_end));
+	//printf(" - (%lu) milliseconds after using the fittingroom\n", get_elasped_time(t_start, t_end));
+}
+
+void Person::printPerson(int gender, long t){
+    
+    string g = (gender == 0) ? "MALE" : "FEMALE";
+    cout << "[ " << t << "ms]" << "[input] ";
+    cout << "A person (" << g << ") goes into the queue" << endl;
 }
 
 Person::Person() {
@@ -61,9 +68,9 @@ void Fittingroom::add_person(Person& p) {
 }
 
 
-void Fittingroom::printVector(vector<Person> v){
+void Fittingroom::printVector(vector<Person> v, string str){
     
-    cout << "print Vector" << endl;
+    cout << str << endl;
     cout << "Gender\tOrder" << endl;
     cout << "-------------------" << endl;
     for(int i = 0; i < v.size(); i++){
@@ -76,4 +83,11 @@ void Fittingroom::printVector(vector<Person> v){
 }
 
 
-
+void Fittingroom::printSendRoom(vector<Person> fitroom, int gender, long t){
+    
+    string g = (gender == 0) ? "MALE" : "FEMALE";
+    cout << "[" << "?" << " ms][Queue] Send (" << g << ") into the fitting room"
+          << "(stay " << t << "ms),"
+           << "Status:" << endl;
+    cout << "Total:" << "x (Men: x, Women: x)" << endl;
+}
