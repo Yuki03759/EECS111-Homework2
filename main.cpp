@@ -36,10 +36,10 @@ int main(int argc, char** argv)
 	gettimeofday(&t_global_start, NULL);
 
 	pthread_t       tid[2];
-	int             status = 0;
-	int             work = 0;
     
     room.set_num(each_gender_cnt);
+    room.set_stall(number_of_stalls);
+    
     
     if(pthread_create(&tid[0], NULL, createPerson, NULL)) {
         fprintf(stderr, "Error creating thread\n");		
@@ -58,7 +58,7 @@ int main(int argc, char** argv)
         }
     }
     
-    //room.printVector(room.waitList, "waitList after thread");
+    //room.printVector(room.inList, "waitList after thread");
     
     
 	return 0;

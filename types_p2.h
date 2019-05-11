@@ -51,7 +51,7 @@ public:
 
 	void start(void);
 	void complete(void);
-    void printPerson(int gender, long t);
+    void printPerson();
 };
 
 
@@ -61,6 +61,7 @@ class Fittingroom {
 	
     int status; 
     int num;
+    int stall;
 	// You need to define the data structure to
     // save the information of people using the fittingroom
 	// You can probebly use Standard Template Library (STL) vector
@@ -76,15 +77,18 @@ public:
     void set_num(int num);
     int get_num(void);
     
+    void set_stall(int stall);
+    int get_stall(void);
+    
     void set_status(int status);
     int get_status(void);
     
     // You need to use this function to print the Fittingroom's status
 	void print_status(void);
 
-	// Call by reference
-	// This is just an example. You can implement any function you need
-	void add_person(Person& p);
+	void change_status(Person& p);
+    
+    void add_person(Person& p);
 
     void printVector(vector<Person> v, string str);
 
