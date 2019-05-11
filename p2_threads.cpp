@@ -37,7 +37,6 @@ void *createPerson(void *parm){
         
         p->set_order(i+1);
         interval = rand()%4+1;
-        cout << p << " ";
         p->printPerson();
         usleep(MSEC(interval));
         room.waitList.push_back(*p);   
@@ -63,7 +62,7 @@ void *assignPerson(void *parm){
    
     srand(time(NULL));
     
-    while(num_added < num_to_add){
+    while(num_added != num_to_add){
         
         pthread_mutex_lock(&mutex_1);
         
@@ -73,88 +72,41 @@ void *assignPerson(void *parm){
             temp.push_back(room.waitList[0]);
             
             //remove from waitList
-            cout << room.waitList[0].get_gender() << " will be put in temp queue" << endl;
+            cout << "Person "<< room.waitList[0].get_order();
+            cout << " will be put in temp queue" << endl;
             room.waitList.erase(room.waitList.begin());    
-            num_added ++;
         }
            
         pthread_mutex_unlock(&mutex_1);
         //assignment Person part 2 - add people linst
         
         pthread_mutex_lock(&mutex_2);
-  /*      if (room.inList.size() == room.get_stall())
+        if (room.inList.size() == room.get_stall())
         {
             cout << "room full " << room.inList.size() << " out of " << room.get_stall() << endl;
-            room.printVector(       room.inList           , "Ilist"  );
+            room.printVector(       room.inList           , "inlist"  );
         }
         else if (temp.size() == 0 )
         {
-            cout << "noone to add" << endl;
+            //cout << "none to add" << endl;
+            ;
         }
-        else if( room.get_status() == WOMENPRESENT )
-        {
-            int i = 0;
-            while ( i < temp.size() && (room.inList.size() < room.get_stall()) )
-            {
-                if( temp[i].get_gender() == FEMALE )
-                {
-                    cout << "added women to list staus is women present" << endl;
-                    room.add_person(temp[i]);
-                    temp.erase( temp.begin() + i );
-                    num_added++;
-                }
-                else
-                {
-                //    cout << "men not added " << endl;
-                    i++;   
-                }
-            }  
-       }
-       else if( room.get_status() == MENPRESENT)
-       {
-           //add every man from temp to inlist until inlist is full or no more man in temp
-            int size = temp.size();
-            int i = 0;
-            while ( i < temp.size() && (room.inList.size() < room.get_stall()) )
-            {
-                if( temp[i].get_gender() == MALE )
-                {
-                    cout << "added men status is men present" << endl;
-                    room.add_person(temp[i]);
-                    temp.erase( temp.begin() + i );
-                    num_added++;
-                }
-                else
-                {
-                    i++;   
-                }
-            }  
-       }
        else
        {
-            int gender_to_add = temp[0].get_gender();
-            int i = 0;
-            while ( i < temp.size() && (room.inList.size() < room.get_stall()) )
-            {
-                if( temp[i].get_gender() == gender_to_add )
-                {
-                    room.add_person(temp[i]);
-                    temp.erase( temp.begin() + i );
-                    num_added++;
-                }
-                else
-                {
-                    i++;   
-                }
-            } 
-       }
-       
-       
-    */ 
+            while( temp.size() != 0 && room.allowed(temp[0]) ){
+                room.add_person(temp[0]);
+                temp.erase( temp.begin() );
+                num_added++;
+                cout << "person " << room.inList[room.inList.size()-1].get_order() << " removed. Status is " ;
+                room.print_status();
+            }
+       } 
         pthread_mutex_unlock(&mutex_2);
-     }
+    }
      
-
+    cout << "num_added : " << num_added << endl;
+    cout << "num_to_add : " << num_to_add << endl;
+    
     cout << "assign terminated " << endl;
   
     pthread_exit(0);
@@ -163,24 +115,35 @@ void *assignPerson(void *parm){
 void *removePerson(void *parm){
     
     //remove after finished 
-/*
+ 
     int num_to_remove = 2 * room.get_num();
     int num_removed = 0;
     int i = 0;
     while(num_removed < num_to_remove ){
         
         pthread_mutex_lock(&mutex_2);
-        
+      
         for(int i = 0; i < room.inList.size(); i++){
+            
             if(room.inList[i].ready_to_leave() == 1){
+                cout << "Person " << room.inList[i].get_order() << " removed. Status is " ;
+                room.print_status();
                 room.inList.erase(room.inList.begin()+i);
                 num_removed++;
                 i--;
             }
         }
+        
+        if(room.inList.size() == 0)    
+        {    
+            room.set_status(EMPTY);
+            //cout << "Status is ";
+            //room.print_status();
+        }
+        //cout << "num_removed " << num_removed << endl;
         pthread_mutex_unlock(&mutex_2);  
     }
-    */
+    
     cout << "remove terminated " << endl;
 
     pthread_exit(0);

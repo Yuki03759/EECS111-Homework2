@@ -38,7 +38,7 @@ void Person::complete(void) {
 void Person::printPerson(){
     
     string g = (gender == 0) ? "MALE" : "FEMALE";
-    cout << "[input] A person (" << g << ") goes into the queue stays " << time_to_stay_ms << "ms" << endl;
+    cout << "[input] Person " << order << "(" << g << ") goes into the queue stays " << time_to_stay_ms << "ms" << endl;
 }
 
 Person::Person() {
@@ -56,8 +56,23 @@ int Fittingroom::get_status(void)     { return status; }
 
 // You need to use this function to print the Fittingroom's status
 void Fittingroom::print_status(void) {
-	printf("Print fittingroom status\n");
-    cout << "Status : " << status << endl;
+    
+    string str;
+    if(status == 0)
+    {
+        str = "EMPTY";
+    }
+    else if(status == 1)
+    {
+        str = "WOMENPRESENT";
+    }
+    else
+    {
+        str = "MENPRESENT";
+    }
+        
+        
+    cout << str << endl;
 }
 
 void Fittingroom::change_status(Person& p)
@@ -87,6 +102,19 @@ void Fittingroom::add_person(Person& p)
    
 }
 
+bool Fittingroom::allowed(Person& p)
+{
+    if( inList.size() == stall )
+        return false;
+    
+    return 
+          (p.get_gender() == 0 && status == MENPRESENT)
+        ||
+          (p.get_gender() == 1 && status == WOMENPRESENT)
+        || 
+          (status == EMPTY);
+          
+}
 
 
 void Fittingroom::printVector(vector<Person> v, string str){

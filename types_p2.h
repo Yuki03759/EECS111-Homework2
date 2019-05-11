@@ -20,6 +20,7 @@ enum Gender{
     FEMALE
 };
 
+
 class Person
 {
 
@@ -90,6 +91,8 @@ public:
     
     void add_person(Person& p);
 
+    bool allowed(Person& p);
+    
     void printVector(vector<Person> v, string str);
 
     void printSendRoom(vector<Person> fitroom, int gender, long t);
