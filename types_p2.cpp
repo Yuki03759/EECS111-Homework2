@@ -35,11 +35,18 @@ void Person::complete(void) {
 	printf(" - (%lu) milliseconds after using the fittingroom\n", get_elasped_time(t_start, t_end));
 }
 
-void Person::printPerson(){
+void Person::woman_wants_to_enter(){
     
-    string g = (gender == 0) ? "MALE" : "FEMALE";
-    cout << "[input] Person " << order << "(" << g << ") goes into the queue stays " << time_to_stay_ms << "ms" << endl;
+    string g = (gender == 0) ? "Man" : "Woman";
+    cout << "[input] A person ("  << g << ") goes into the queue" << endl;
 }
+
+void Person::man_wants_to_enter(){
+    
+    string g = (gender == 0) ? "Man" : "Woman";
+    cout << "[input] A person ("  << g << ") goes into the queue" << endl;
+}
+
 
 Person::Person() {
 	gettimeofday(&t_create, NULL);
@@ -77,6 +84,8 @@ void Fittingroom::print_status(void) {
 
 void Fittingroom::change_status(Person& p)
 {
+    int old_status = status;
+    
     if(status == EMPTY)
     {
         if(p.get_gender() == MALE)
@@ -90,16 +99,40 @@ void Fittingroom::change_status(Person& p)
             status = WOMENPRESENT;
         }
     }
+    
+    if (old_status != status)
+        status_changed = true;
 }
+
 
 void Fittingroom::add_person(Person& p) 
 {
 	inList.push_back(p);
     p.start();
     
+    if(p.get_gender() == MALE)
+        num_men++;
+    else
+        num_women++;
+    
+    total++;
+    
     //change status
     change_status(p);
    
+}
+
+
+void Fittingroom::remove_person(int i)
+{
+    if(inList[i].get_gender() == MALE)
+        num_men--;
+    else
+        num_women--;
+    total--;
+    
+    inList.erase(inList.begin() + i);
+    
 }
 
 bool Fittingroom::allowed(Person& p)
@@ -132,11 +165,81 @@ void Fittingroom::printVector(vector<Person> v, string str){
 }
 
 
-void Fittingroom::printSendRoom(vector<Person> fitroom, int gender, long t){
+void Fittingroom::printSendRoom(Person &p, int time_stay){
     
-    string g = (gender == 0) ? "MALE" : "FEMALE";
-    cout << "[" << "?" << " ms][Queue] Send (" << g << ") into the fitting room"
-          << "(stay " << t << "ms),"
-           << "Status:" << endl;
-    cout << "Total:" << "x (Men: x, Women: x)" << endl;
+    string g = (p.get_gender() == 0) ? "Man" : "Woman";
+    string s;
+    
+    if(status == EMPTY)
+        s = "EMPTY";
+    else if (status == MENPRESENT)
+        s = "MANPRESENT";
+    else
+        s = "WOMANPRESENT";
+    
+    cout << "[Queue] Send (" << g << ") into the fitting room"
+          << " (stay " << time_stay  << " ms),"
+           << "Status: ";
+    cout << "Total: " << total << " (Men: " << num_men <<
+            ") Women: " << num_women << ")" << endl;
 }
+
+void Fittingroom::printLeaveRoom(Person &p){  
+    string g = (p.get_gender() == 0) ? "Man" : "Woman";
+    string s;
+    if(status == EMPTY)
+        s = "EMPTY";
+    else if (status == MENPRESENT)
+        s = "MANPRESENT";
+    else
+        s = "WOMANPRESENT";
+    cout << "[fitting room] (" << g << ") left the fitting room. ";
+    
+    if(status_changed == true)
+        cout << "Status is changed, Status is (" << s << "): ";
+    else
+        cout << "Status is (" << s << "): ";
+    cout << "Total: " << total << " (Men: " << num_men <<
+            ") Women: " << num_women << ")" << endl;
+    
+}
+
+void Fittingroom::woman_leaves(Person &p){
+    
+    string g = (p.get_gender() == 0) ? "Man" : "Woman";
+    string s;
+    if(status == EMPTY)
+        s = "EMPTY";
+    else if (status == MENPRESENT)
+        s = "MANPRESENT";
+    else
+        s = "WOMANPRESENT";
+    cout << "[fitting room] (" << g << ") left the fitting room. ";
+    
+    if(status_changed == true)
+        cout << "Status is changed, Status is (" << s << "): ";
+    else
+        cout << "Status is (" << s << "): ";
+    cout << "Total: " << total << " (Men: " << num_men <<
+            ") Women: " << num_women << ")" << endl;
+}    
+
+void Fittingroom::man_leaves(Person &p){
+    
+    string g = (p.get_gender() == 0) ? "Man" : "Woman";
+    string s;
+    if(status == EMPTY)
+        s = "EMPTY";
+    else if (status == MENPRESENT)
+        s = "MANPRESENT";
+    else
+        s = "WOMANPRESENT";
+    cout << "[fitting room] (" << g << ") left the fitting room. ";
+    
+    if(status_changed == true)
+        cout << "Status is changed, Status is (" << s << "): ";
+    else
+        cout << "Status is (" << s << "): ";
+    cout << "Total: " << total << " (Men: " << num_men <<
+            ") Women: " << num_women << ")" << endl;
+}        

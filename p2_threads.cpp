@@ -1,28 +1,30 @@
 #include "p2_threads.h"
 #include "utils.h"
 #include <assert.h>
-extern pthread_cond_t  cond;
-extern pthread_mutex_t mutex;
+
 extern Fittingroom room;
 pthread_mutex_t mutex_1 = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t mutex_2 = PTHREAD_MUTEX_INITIALIZER;
+extern struct timeval t_global_start;
 
 using namespace std;
 
 
 void *createPerson(void *parm){
-    
-    cout << "\ncreatePerson started\n" << endl;
+    struct timeval t_current;
     int total_num = 2 * room.get_num();
     int male_cnt = room.get_num();
     int female_cnt = room.get_num();
     int interval;
     srand( time(NULL) );
     assert ( room.inList.size() == 0);
+    
+    
     for(int i = 0; i < total_num; i++){
         //create a random person
         Person* p = new Person();
         p->set_time(rand()%4+1);
+        
         
         pthread_mutex_lock(&mutex_1);
         
@@ -36,26 +38,26 @@ void *createPerson(void *parm){
         }
         
         p->set_order(i+1);
-        interval = rand()%4+1;
-        p->printPerson();
-        usleep(MSEC(interval));
+        interval = rand()%5+1;
+        
         room.waitList.push_back(*p);   
         
         pthread_mutex_unlock(&mutex_1);
-        
-    }
+        usleep(MSEC(interval));
+       
+        }
     
-    cout << "create terminated " << endl;
     pthread_exit(0);
     
 }
 
 void *assignPerson(void *parm){
  
-    cout << "\nassignPerson started\n" << endl;
+    struct timeval t_current;
     vector<Person> temp;
     int num_to_add = 2 * room.get_num();
     int num_added = 0;
+    int interval = 0;
    
     
     //remove every person from waiting list and push back to temp
@@ -70,10 +72,15 @@ void *assignPerson(void *parm){
             
             //add to temp room
             temp.push_back(room.waitList[0]);
+            gettimeofday(&t_current, NULL);
+            
+            cout << "[" << get_elasped_time(t_global_start, t_current) << " ms]";
+            if(room.waitList[0].get_gender() == FEMALE)
+                room.waitList[0].woman_wants_to_enter();
+            else
+                room.waitList[0].man_wants_to_enter();
             
             //remove from waitList
-            cout << "Person "<< room.waitList[0].get_order();
-            cout << " will be put in temp queue" << endl;
             room.waitList.erase(room.waitList.begin());    
         }
            
@@ -81,33 +88,27 @@ void *assignPerson(void *parm){
         //assignment Person part 2 - add people linst
         
         pthread_mutex_lock(&mutex_2);
-        if (room.inList.size() == room.get_stall())
+        if (room.inList.size() == room.get_stall() || temp.size() == 0)
         {
-            cout << "room full " << room.inList.size() << " out of " << room.get_stall() << endl;
-            room.printVector(       room.inList           , "inlist"  );
-        }
-        else if (temp.size() == 0 )
-        {
-            //cout << "none to add" << endl;
             ;
         }
        else
        {
             while( temp.size() != 0 && room.allowed(temp[0]) ){
+                gettimeofday(&t_current, NULL);
+                cout << "[" << get_elasped_time(t_global_start, t_current) << " ms]";
+                interval = rand()%7+3;
                 room.add_person(temp[0]);
+                room.printSendRoom(temp[0], interval);
                 temp.erase( temp.begin() );
                 num_added++;
-                cout << "person " << room.inList[room.inList.size()-1].get_order() << " removed. Status is " ;
-                room.print_status();
+                usleep(MSEC(interval));
+                
             }
        } 
         pthread_mutex_unlock(&mutex_2);
     }
      
-    cout << "num_added : " << num_added << endl;
-    cout << "num_to_add : " << num_to_add << endl;
-    
-    cout << "assign terminated " << endl;
   
     pthread_exit(0);
 }
@@ -115,6 +116,7 @@ void *assignPerson(void *parm){
 void *removePerson(void *parm){
     
     //remove after finished 
+    struct timeval t_current;
  
     int num_to_remove = 2 * room.get_num();
     int num_removed = 0;
@@ -126,9 +128,12 @@ void *removePerson(void *parm){
         for(int i = 0; i < room.inList.size(); i++){
             
             if(room.inList[i].ready_to_leave() == 1){
-                cout << "Person " << room.inList[i].get_order() << " removed. Status is " ;
-                room.print_status();
-                room.inList.erase(room.inList.begin()+i);
+                //room.inList.erase(room.inList.begin()+i);
+                gettimeofday(&t_current, NULL);
+                room.remove_person(i);
+                cout << "[" << get_elasped_time(t_global_start, t_current) << " ms]";
+                room.printLeaveRoom(room.inList[i]);
+                
                 num_removed++;
                 i--;
             }
@@ -137,14 +142,11 @@ void *removePerson(void *parm){
         if(room.inList.size() == 0)    
         {    
             room.set_status(EMPTY);
-            //cout << "Status is ";
-            //room.print_status();
         }
-        //cout << "num_removed " << num_removed << endl;
+        
         pthread_mutex_unlock(&mutex_2);  
     }
     
-    cout << "remove terminated " << endl;
 
     pthread_exit(0);
 }

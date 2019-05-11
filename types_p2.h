@@ -49,8 +49,9 @@ public:
 
 	void set_time(long data);
 	int ready_to_leave(void);
-
-	void start(void);
+    void woman_wants_to_enter();
+    void man_wants_to_enter();
+    void start(void);
 	void complete(void);
     void printPerson();
 };
@@ -63,6 +64,10 @@ class Fittingroom {
     int status; 
     int num;
     int stall;
+    int num_men;
+    int num_women;
+    int total;
+    bool status_changed;
 	// You need to define the data structure to
     // save the information of people using the fittingroom
 	// You can probebly use Standard Template Library (STL) vector
@@ -71,6 +76,10 @@ class Fittingroom {
 public:
 	Fittingroom(){
 		status = EMPTY;
+        num_men = 0;
+        num_women = 0;
+        total = 0;
+        status_changed = false;
 	}
     vector<Person> waitList;
     vector<Person> inList;
@@ -91,11 +100,17 @@ public:
     
     void add_person(Person& p);
 
+    void remove_person(int i);
+    
     bool allowed(Person& p);
     
     void printVector(vector<Person> v, string str);
 
-    void printSendRoom(vector<Person> fitroom, int gender, long t);
+    void printSendRoom(Person &p, int time_stay);
+    
+    void printLeaveRoom(Person &p);
+    void woman_leaves(Person &p);
+	void man_leaves(Person &p);
 };
 
 
