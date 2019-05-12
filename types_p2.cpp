@@ -12,9 +12,14 @@ unsigned long Person::get_order(void)      { return order; }
 void Person::set_use_order(unsigned long data) { use_order = data; }
 unsigned long Person::get_use_order(void)      { return use_order; }
 
-void Person::set_time(long data) { time_to_stay_ms = data; }
+void Person::set_time(long data)        { time_to_stay_ms = data; }
+unsigned long Person::get_time(void)    { return time_to_stay_ms; }
 
-int Person::ready_to_leave(void) {
+void Person::start(void)    { gettimeofday(&t_start, NULL);}
+void Person::complete(void) { gettimeofday(&t_end, NULL);}
+
+int Person::ready_to_leave(void) 
+{
 	struct timeval t_curr;
 	gettimeofday(&t_curr, NULL);
 
@@ -22,29 +27,17 @@ int Person::ready_to_leave(void) {
 	else { return 0; }
 }
 
-void Person::start(void) {
-	gettimeofday(&t_start, NULL);
-//	printf("(%lu)th person enters the fittingroom: \n", order);
-//	printf(" - (%lu) milliseconds after the creation\n", get_elasped_time(t_create, t_start));
-}
 
-void Person::complete(void) {
-	gettimeofday(&t_end, NULL);
-	printf("(%lu)th person comes out of the fittingroom: \n", order);
-	printf(" - (%lu) milliseconds after the creation\n", get_elasped_time(t_create, t_end));
-	printf(" - (%lu) milliseconds after using the fittingroom\n", get_elasped_time(t_start, t_end));
-}
-
-void Person::woman_wants_to_enter(){
-    
+void Person::woman_wants_to_enter()
+{    
     string g = (gender == 0) ? "Man" : "Woman";
-    cout << "[input] A person ("  << g << ") goes into the queue" << endl;
+    cout << "[input] A person ("  << g << " " << order << ") goes into the queue" << endl;
 }
 
 void Person::man_wants_to_enter(){
     
     string g = (gender == 0) ? "Man" : "Woman";
-    cout << "[input] A person ("  << g << ") goes into the queue" << endl;
+    cout << "[input] A person ("  << g << " " << order << ") goes into the queue" << endl;
 }
 
 
@@ -62,8 +55,8 @@ void Fittingroom::set_status(int data) { status = data; }
 int Fittingroom::get_status(void)     { return status; }
 
 // You need to use this function to print the Fittingroom's status
-void Fittingroom::print_status(void) {
-    
+void Fittingroom::print_status(void) 
+{
     string str;
     if(status == 0)
     {
@@ -84,6 +77,7 @@ void Fittingroom::print_status(void) {
 
 void Fittingroom::change_status(Person& p)
 {
+    // false == 0 & true == 1
     int old_status = status;
     
     if(status == EMPTY)
@@ -100,8 +94,15 @@ void Fittingroom::change_status(Person& p)
         }
     }
     
+    if(inList.size() == 0)
+    {
+        status = EMPTY;
+    }
+    
     if (old_status != status)
         status_changed = true;
+    else
+        status_changed = false;
 }
 
 
@@ -110,8 +111,9 @@ void Fittingroom::add_person(Person& p)
 	inList.push_back(p);
     p.start();
     
-    if(p.get_gender() == MALE)
+    if(p.get_gender() == MALE){
         num_men++;
+    }
     else
         num_women++;
     
@@ -125,13 +127,19 @@ void Fittingroom::add_person(Person& p)
 
 void Fittingroom::remove_person(int i)
 {
+    assert(inList[i].ready_to_leave());
+    //male or female count
     if(inList[i].get_gender() == MALE)
         num_men--;
     else
         num_women--;
     total--;
     
+    // remove the person
     inList.erase(inList.begin() + i);
+    
+    // change status
+    change_status(inList[i]);
     
 }
 
@@ -150,22 +158,7 @@ bool Fittingroom::allowed(Person& p)
 }
 
 
-void Fittingroom::printVector(vector<Person> v, string str){
-    
-    cout << str << endl;
-    cout << "Gender\tOrder" << endl;
-    cout << "-------------------" << endl;
-    for(int i = 0; i < v.size(); i++){
-        if(v[i].get_gender() == MALE)
-            cout << "Male" <<'\t';
-        else
-            cout << "Female" << '\t';
-        cout << v[i].get_order() << endl; 
-    }
-}
-
-
-void Fittingroom::printSendRoom(Person &p, int time_stay){
+void Fittingroom::printSendRoom(Person &p){
     
     string g = (p.get_gender() == 0) ? "Man" : "Woman";
     string s;
@@ -177,69 +170,72 @@ void Fittingroom::printSendRoom(Person &p, int time_stay){
     else
         s = "WOMANPRESENT";
     
-    cout << "[Queue] Send (" << g << ") into the fitting room"
-          << " (stay " << time_stay  << " ms),"
-           << "Status: ";
+    cout << "[Queue] Send (" << g << " " << p.get_order() <<  ") into the fitting room"
+          << " (stay " << p.get_time() << " ms),"
+           << " Status: ";
     cout << "Total: " << total << " (Men: " << num_men <<
-            ") Women: " << num_women << ")" << endl;
+            " Women: " << num_women << ")" << endl;
 }
 
-void Fittingroom::printLeaveRoom(Person &p){  
+void Fittingroom::person_goes(Person &p){
+    string g = (p.get_gender() == 0) ? "Man" : "Woman";
+    string str_status;
+    
+    cout << "[fitting room] (" << g << " " << p.get_order() << ") goes into the fitting room (Stay " << p.get_time() 
+            << "ms), ";
+    
+    cout << "Status: Total: " << total << 
+            " (Men: " << num_men << ", Women: " << num_women << ")" << endl;
+  
+}
+
+
+void Fittingroom::woman_leaves(int i)
+{
+    Person p = inList[i];
+    assert(p.ready_to_leave());
     string g = (p.get_gender() == 0) ? "Man" : "Woman";
     string s;
+    
     if(status == EMPTY)
         s = "EMPTY";
     else if (status == MENPRESENT)
         s = "MANPRESENT";
     else
         s = "WOMANPRESENT";
-    cout << "[fitting room] (" << g << ") left the fitting room. ";
+    
+    cout << "[fitting room] (" << g << " " << p.get_order() << ") left the fitting room. ";
     
     if(status_changed == true)
         cout << "Status is changed, Status is (" << s << "): ";
     else
         cout << "Status is (" << s << "): ";
+    
     cout << "Total: " << total << " (Men: " << num_men <<
-            ") Women: " << num_women << ")" << endl;
-    
-}
-
-void Fittingroom::woman_leaves(Person &p){
-    
-    string g = (p.get_gender() == 0) ? "Man" : "Woman";
-    string s;
-    if(status == EMPTY)
-        s = "EMPTY";
-    else if (status == MENPRESENT)
-        s = "MANPRESENT";
-    else
-        s = "WOMANPRESENT";
-    cout << "[fitting room] (" << g << ") left the fitting room. ";
-    
-    if(status_changed == true)
-        cout << "Status is changed, Status is (" << s << "): ";
-    else
-        cout << "Status is (" << s << "): ";
-    cout << "Total: " << total << " (Men: " << num_men <<
-            ") Women: " << num_women << ")" << endl;
+            " Women: " << num_women << ")" << endl;
 }    
 
-void Fittingroom::man_leaves(Person &p){
-    
+void Fittingroom::man_leaves(int i)
+{    
+    Person p = inList[i];
+    assert(p.ready_to_leave());
     string g = (p.get_gender() == 0) ? "Man" : "Woman";
-    string s;
+    string str;
+    int s;
+    
     if(status == EMPTY)
-        s = "EMPTY";
+        str = "EMPTY";
     else if (status == MENPRESENT)
-        s = "MANPRESENT";
+        str = "MANPRESENT";
     else
-        s = "WOMANPRESENT";
-    cout << "[fitting room] (" << g << ") left the fitting room. ";
+        str = "WOMANPRESENT";
+    cout << "[fitting room] (" << g << " " << p.get_order() << ") left the fitting room. ";
     
     if(status_changed == true)
-        cout << "Status is changed, Status is (" << s << "): ";
+        cout << "Status is changed, Status is (" << str << "): ";
     else
-        cout << "Status is (" << s << "): ";
+        cout << "Status is (" << str << "): ";
+    
     cout << "Total: " << total << " (Men: " << num_men <<
-            ") Women: " << num_women << ")" << endl;
+            " Women: " << num_women << ")" << endl;
 }        

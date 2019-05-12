@@ -56,13 +56,9 @@ int main(int argc, char** argv)
         if(pthread_join(tid[i], NULL)) {
             fprintf(stderr, "Error joining thread\n");	
         }
-    }
-    
-    //room.printVector(room.inList, "waitList after thread");
-    
+    }  
     
 	return 0;
-
-
+    
 }
 

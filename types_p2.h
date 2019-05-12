@@ -8,6 +8,7 @@
 #include <string>
 #include <vector>
 #include <unistd.h>
+#include <assert.h>
 
 #define EMPTY        0
 #define WOMENPRESENT 1
@@ -48,6 +49,8 @@ public:
 	unsigned long get_use_order(void);
 
 	void set_time(long data);
+    unsigned long get_time(void);
+    
 	int ready_to_leave(void);
     void woman_wants_to_enter();
     void man_wants_to_enter();
@@ -104,13 +107,12 @@ public:
     
     bool allowed(Person& p);
     
-    void printVector(vector<Person> v, string str);
-
-    void printSendRoom(Person &p, int time_stay);
+    void printSendRoom(Person &p);
     
     void printLeaveRoom(Person &p);
-    void woman_leaves(Person &p);
-	void man_leaves(Person &p);
+    void woman_leaves(int i);
+	void man_leaves(int i);
+    void person_goes(Person &p);
 };
 
 
