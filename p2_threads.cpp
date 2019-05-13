@@ -26,7 +26,7 @@ void *createPerson(void *parm)
         
         // create a person
         Person* p = new Person();
-        p->set_time(rand()%7+3);
+        p->set_time(rand()%8+3);
         p->set_order(i+1);
         
         // randomly assign male or female
@@ -144,15 +144,25 @@ void *removePerson(void *parm)
         {
             if(room.inList[i].ready_to_leave() )
             {
+                int temp_i = i;
+                int temp_gender = room.inList[i].get_gender();
+                Person temp_person = room.inList[i];
+                
                 gettimeofday(&t_current, NULL);
                 cout << "[" << get_elasped_time(t_global_start, t_current) << " ms]";
+                room.remove_person(i);
+                
+                if(temp_gender == FEMALE)
+                    room.woman_leaves(temp_person);
+                else
+                    room.man_leaves(temp_person);
+                /*
                 if(room.inList[i].get_gender() == FEMALE)
                     room.woman_leaves(i);
                 else
                     room.man_leaves(i);
             
-                room.remove_person(i);
-           
+           */
                 num_removed++;
                 i--;
             }

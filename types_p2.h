@@ -110,8 +110,8 @@ public:
     void printSendRoom(Person &p);
     
     void printLeaveRoom(Person &p);
-    void woman_leaves(int i);
-	void man_leaves(int i);
+    void woman_leaves(Person &p);
+	void man_leaves(Person &p);
     void person_goes(Person &p);
 };
 

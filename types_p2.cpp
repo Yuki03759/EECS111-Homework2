@@ -31,13 +31,13 @@ int Person::ready_to_leave(void)
 void Person::woman_wants_to_enter()
 {    
     string g = (gender == 0) ? "Man" : "Woman";
-    cout << "[input] A person ("  << g << " " << order << ") goes into the queue" << endl;
+    cout << "[input] A person ("  << g <<  ") goes into the queue" << endl;
 }
 
 void Person::man_wants_to_enter(){
     
     string g = (gender == 0) ? "Man" : "Woman";
-    cout << "[input] A person ("  << g << " " << order << ") goes into the queue" << endl;
+    cout << "[input] A person ("  << g <<  ") goes into the queue" << endl;
 }
 
 
@@ -109,7 +109,7 @@ void Fittingroom::change_status(Person& p)
 void Fittingroom::add_person(Person& p) 
 {
 	inList.push_back(p);
-    p.start();
+    inList[inList.size()-1].start();
     
     if(p.get_gender() == MALE){
         num_men++;
@@ -170,7 +170,7 @@ void Fittingroom::printSendRoom(Person &p){
     else
         s = "WOMANPRESENT";
     
-    cout << "[Queue] Send (" << g << " " << p.get_order() <<  ") into the fitting room"
+    cout << "[Queue] Send (" << g  <<  ") into the fitting room"
           << " (stay " << p.get_time() << " ms),"
            << " Status: ";
     cout << "Total: " << total << " (Men: " << num_men <<
@@ -181,7 +181,7 @@ void Fittingroom::person_goes(Person &p){
     string g = (p.get_gender() == 0) ? "Man" : "Woman";
     string str_status;
     
-    cout << "[fitting room] (" << g << " " << p.get_order() << ") goes into the fitting room (Stay " << p.get_time() 
+    cout << "[fitting room] (" << g  << ") goes into the fitting room (Stay " << p.get_time() 
             << "ms), ";
     
     cout << "Status: Total: " << total << 
@@ -190,9 +190,8 @@ void Fittingroom::person_goes(Person &p){
 }
 
 
-void Fittingroom::woman_leaves(int i)
+void Fittingroom::woman_leaves(Person &p)
 {
-    Person p = inList[i];
     assert(p.ready_to_leave());
     string g = (p.get_gender() == 0) ? "Man" : "Woman";
     string s;
@@ -204,20 +203,19 @@ void Fittingroom::woman_leaves(int i)
     else
         s = "WOMANPRESENT";
     
-    cout << "[fitting room] (" << g << " " << p.get_order() << ") left the fitting room. ";
+    cout << "[fitting room] (" << g  << ") left the fitting room. ";
     
     if(status_changed == true)
         cout << "Status is changed, Status is (" << s << "): ";
     else
-        cout << "Status is (" << s << "): ";
+        cout << "State is (" << s << "): ";
     
     cout << "Total: " << total << " (Men: " << num_men <<
             " Women: " << num_women << ")" << endl;
 }    
 
-void Fittingroom::man_leaves(int i)
+void Fittingroom::man_leaves(Person &p)
 {    
-    Person p = inList[i];
     assert(p.ready_to_leave());
     string g = (p.get_gender() == 0) ? "Man" : "Woman";
     string str;
@@ -229,7 +227,7 @@ void Fittingroom::man_leaves(int i)
         str = "MANPRESENT";
     else
         str = "WOMANPRESENT";
-    cout << "[fitting room] (" << g << " " << p.get_order() << ") left the fitting room. ";
+    cout << "[fitting room] (" << g  << ") left the fitting room. ";
     
     if(status_changed == true)
         cout << "Status is changed, Status is (" << str << "): ";
